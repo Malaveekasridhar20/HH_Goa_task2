@@ -25,8 +25,14 @@ pipeline = VoiceRAGPipeline()
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Initializing and pre-warming the RAG pipeline models...")
+    logger.info("Initializing RAG pipeline...")
     
+    # We deliberately skip PyTorch warmup on boot to prevent OOM kills on Render free tier.
+    # PyTorch will initialize lazily on the first API request instead.
+    if os.getenv("DISABLE_STARTUP_WARMUP", "true").lower() == "true":
+        logger.info("Skipping heavy model warmup to conserve boot memory.")
+        return
+
     # 1. Warm up the SentenceTransformer PyTorch forward pass using a simple query
     try:
         pipeline.en_retriever.embedding_service.encode_query("warmup")
