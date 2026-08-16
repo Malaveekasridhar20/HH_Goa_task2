@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice RAG Demo</title>
+    <style>
+        :root {
+            --bg-color: #0e7236;
+            --panel-bg: rgba(10, 89, 41, 0.9);
+            --primary: #fae120;
+            --primary-hover: #dfc818;
+            --danger: #f11c75;
+            --danger-hover: #d11261;
+            --text-main: #ffffff;
+            --text-title: #fae120;
+            --text-muted: #d1fae5;
+            --border: rgba(250, 225, 32, 0.3);
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .logo-container {
+            position: relative;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120px;
+        }
+        
+        .logo-text {
+            max-width: 100%;
+            height: auto;
+            max-height: 120px;
+        }
+
+        .hindi-text {
+            position: absolute;
+            max-width: 80px;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: var(--text-title);
+            font-size: 2.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        select, button, input[type="file"] {
+            background: rgba(14, 114, 54, 0.8);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:hover, input[type="file"]:hover {
+            border-color: var(--primary);
+        }
+
+        button {
+            background: var(--primary);
+            color: var(--bg-color);
+            border: none;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #ffffff;
+        }
+        
+        .btn-danger:hover {
+            background: var(--danger-hover);
+        }
+
+        .fallback-upload {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .fallback-upload input {
+            padding: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        .status-box {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            min-height: 24px;
+            font-weight: 500;
+        }
+
+        .status-recording { color: var(--danger); animation: pulse 1.5s infinite; }
+        .status-processing { color: var(--primary); animation: pulse 1.5s infinite; }
+        .status-error { color: var(--danger); }
+        .status-success { color: var(--success); }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .answer-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .stat-val {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .sources {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .sources span {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
+            button, select { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-container">
+        <img src="assets/logo_text.png" alt="Hacker House" class="logo-text">
+        <img src="assets/hindi_text.png" alt="Goa" class="hindi-text">
+    </div>
+    <p class="subtitle">Real-time Grounded Extractive QA</p>
+
+    <div class="controls">
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="hi">Hindi (हिंदी)</option>
+            <option value="ta">Tamil (தமிழ்)</option>
+            <option value="te">Telugu (తెలుగు)</option>
+            <option value="ml">Malayalam (മലയാളം)</option>
+        </select>
+        <button id="recordBtn">Start Recording</button>
+        <button id="stopBtn" class="btn-danger" disabled>Stop Recording</button>
+    </div>
+
+    <div class="fallback-upload">
+        Or upload audio: <input type="file" id="audioUpload" accept="audio/*">
+    </div>
+
+    <div class="status-box" id="statusBox">Ready</div>
+
+    <div class="results" id="resultsBox" style="display: none;">
+        <div class="card">
+            <h3>Transcript</h3>
+            <div id="transcriptText"></div>
+        </div>
+
+        <div class="card">
+            <h3>Answer</h3>
+            <div id="answerText" class="answer-text"></div>
+            <div class="sources" id="sourcesBox"></div>
+        </div>
+
+        <div class="card">
+            <h3>Latency Breakdown</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">STT</span>
+                    <span class="stat-val" id="latStt">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Retrieval</span>
+                    <span class="stat-val" id="latRet">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Generation</span>
+                    <span class="stat-val" id="latGen">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-val" id="latTotal">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const langSelect = document.getElementById('languageSelect');
+    const statusBox = document.getElementById('statusBox');
+    const resultsBox = document.getElementById('resultsBox');
+    const audioUpload = document.getElementById('audioUpload');
+
+    const ui = {
+        transcript: document.getElementById('transcriptText'),
+        answer: document.getElementById('answerText'),
+        sources: document.getElementById('sourcesBox'),
+        latStt: document.getElementById('latStt'),
+        latRet: document.getElementById('latRet'),
+        latGen: document.getElementById('latGen'),
+        latTotal: document.getElementById('latTotal')
+    };
+
+    recordBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                processAudio(audioBlob);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            recordBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusBox.textContent = "Listening...";
+            statusBox.className = "status-box status-recording";
+            resultsBox.style.display = 'none';
+
+        } catch (err) {
+            statusBox.textContent = "Error accessing microphone.";
+            statusBox.className = "status-box status-error";
+            console.error(err);
+        }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            recordBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+    });
+
+    audioUpload.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            processAudio(e.target.files[0]);
+        }
+    });
+
+    async function processAudio(blob) {
+        statusBox.textContent = "Processing audio...";
+        statusBox.className = "status-box status-processing";
+        resultsBox.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('audio', blob, 'audio.wav');
+        formData.append('language', langSelect.value);
+
+        try {
+            const res = await fetch('/api/voice/query', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) throw new Error(`Server returned ${res.status}`);
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                statusBox.textContent = "Complete!";
+                statusBox.className = "status-box status-success";
+            } else {
+                statusBox.textContent = `Error: ${data.error}`;
+                statusBox.className = "status-box status-error";
+            }
+
+            ui.transcript.textContent = data.transcript || "No transcript returned.";
+            ui.answer.textContent = data.answer || "No answer generated.";
+            
+            ui.sources.innerHTML = '';
+            if (data.source_chunk_ids && data.source_chunk_ids.length > 0) {
+                ui.sources.innerHTML = '<strong>Sources: </strong>' + data.source_chunk_ids.map(id => `<span>${id}</span>`).join('');
+            }
+
+            ui.latStt.textContent = data.stt_latency_ms ? `${(data.stt_latency_ms/1000).toFixed(3)}s` : '-';
+            ui.latRet.textContent = data.retrieval_latency_ms ? `${(data.retrieval_latency_ms/1000).toFixed(3)}s` : '-';
+            ui.latGen.textContent = data.generation_latency_ms ? `${(data.generation_latency_ms/1000).toFixed(3)}s` : '-';
+            ui.latTotal.textContent = data.total_latency_ms ? `${(data.total_latency_ms/1000).toFixed(3)}s` : '-';
+            
+            resultsBox.style.display = 'flex';
+        } catch (err) {
+            statusBox.textContent = `Error connecting to API: ${err.message}`;
+            statusBox.className = "status-box status-error";
+        }
+    }
+</script>
+
+</body>
+</html>

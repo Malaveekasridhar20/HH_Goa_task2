@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+numpy
+pydantic
+pydantic-settings
+python-dotenv
+datasets
+pandas
+pytest
+httpx
+faiss-cpu
+sentence-transformers
+rank-bm25
+requests
+torch
