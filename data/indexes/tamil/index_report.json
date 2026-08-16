@@ -1,0 +1,9 @@
+{
+  "language": "ta",
+  "chunks_indexed": 5093,
+  "sentences_indexed": 19470,
+  "embedding_model": "intfloat/multilingual-e5-small",
+  "dimension": 384,
+  "device": "cpu",
+  "build_time_seconds": 323.6243088245392
+}

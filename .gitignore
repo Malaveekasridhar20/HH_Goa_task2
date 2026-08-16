@@ -9,12 +9,9 @@ data/processed/*
 .pytest_cache/
 
 # Indexes and Large Files
-data/indexes/
 *.parquet
 *.wav
 *.mp3
 data/human_audio/
 data/test_audio/
-*.index
-*.pkl
 *.exe

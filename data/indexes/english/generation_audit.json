@@ -1,0 +1,297 @@
+[
+  {
+    "query_id": "1102432",
+    "query": ". what is a corporation?",
+    "answer": "A corporation is a company or group of people authorized to act as a single entity and recognized as such in law, having a continuous existence independent of its members, and powers and liabilities distinct from those of its members.",
+    "source_chunk_ids": [
+      "4c508e273cefcc55ac46e9805935b581",
+      "8c8d3be4498e9e901eb87e9560a67426"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.06053495407104492,
+      "generation": 1.1523704528808594,
+      "total": 1.2129054069519043
+    }
+  },
+  {
+    "query_id": "1102431",
+    "query": "why did rachel carson write an obligation to endure",
+    "answer": "Rachel Carson wrote 'The Obligation to Endure' to argue against the harmful uses of chemicals, pesticides, herbicides, and fertilizers on the environment.",
+    "source_chunk_ids": [
+      "1d0dd7d25cf576dfedf1fa90981722dc"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.041239023208618164,
+      "generation": 0.2714805603027344,
+      "total": 0.31271958351135254
+    }
+  },
+  {
+    "query_id": "90836",
+    "query": "chart for foods low in potassium.",
+    "answer": "Low Sodium Low Potassium Foods List is available for a searchable collection of nutritional data on thousands of foods.",
+    "source_chunk_ids": [
+      "d9afdadf04cbbce8dcef573827a6e905"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03611564636230469,
+      "generation": 0.43848586082458496,
+      "total": 0.47460150718688965
+    }
+  },
+  {
+    "query_id": "55665",
+    "query": "bottom front of a cargo ship",
+    "answer": "The bottom front of a cargo ship is known as the bilge.",
+    "source_chunk_ids": [
+      "3923e25a87939ecd8192e4aa1335114a"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03663134574890137,
+      "generation": 0.2837495803833008,
+      "total": 0.32038092613220215
+    }
+  },
+  {
+    "query_id": "205107",
+    "query": "honesty or integrity definition",
+    "answer": "Honesty is about adherence to the facts, while integrity is about conduct and consistency of actions.",
+    "source_chunk_ids": [
+      "9b759e84ddc46d023881e5208352ed82",
+      "f8f98f75b5f5a0537b37105c56b3e5d6"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03456258773803711,
+      "generation": 0.44545531272888184,
+      "total": 0.48001790046691895
+    }
+  },
+  {
+    "query_id": "1060386",
+    "query": "what is barometric pressure in lincoln ne now?",
+    "answer": "I don't have enough information in the retrieved context to answer that.",
+    "source_chunk_ids": [],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03969168663024902,
+      "generation": 0.27078795433044434,
+      "total": 0.31047964096069336
+    }
+  },
+  {
+    "query_id": "1090356",
+    "query": "struthers city school district state number",
+    "answer": "Ohio",
+    "source_chunk_ids": [
+      "dc73a90f3882b9f1d90b3ac443662a52"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.04389786720275879,
+      "generation": 6.783958911895752,
+      "total": 6.827856779098511
+    }
+  },
+  {
+    "query_id": "168868",
+    "query": "does medical marijuana help with ptsd",
+    "answer": "There is evidence suggesting that medical marijuana may help patients with PTSD, with some studies underway to study its effects.",
+    "source_chunk_ids": [
+      "9543aabfbdd117a9c818940a74f3ee0f",
+      "ebd6c97a19f6cf370ae6bb8f375b49f0",
+      "3bed49f3dab6b552fd8d2d9f0c334a0c",
+      "dc5ee56531712e1ec084c556469c5162"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03401684761047363,
+      "generation": 5.786454200744629,
+      "total": 5.8204710483551025
+    }
+  },
+  {
+    "query_id": "300122",
+    "query": "how many women did frank gifford marry",
+    "answer": "Three",
+    "source_chunk_ids": [
+      "a1704648e3135f1a8c9dcbb2cc369711",
+      "39e1f3d542319fe1725173fcc1e6d26d"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03106832504272461,
+      "generation": 10.536223888397217,
+      "total": 10.567292213439941
+    }
+  },
+  {
+    "query_id": "290643",
+    "query": "how many ongoing trump administration investigations",
+    "answer": "There are three investigations into Russian interference in the 2016 election and alleged collusion with the Trump campaign.",
+    "source_chunk_ids": [
+      "7d0782c6cab32b43196aba431103be18"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03280138969421387,
+      "generation": 6.525782346725464,
+      "total": 6.558583736419678
+    }
+  },
+  {
+    "query_id": "197590",
+    "query": "guide to how to collect followers on wow",
+    "answer": "You can collect followers by questing, or by upgrading your building to level 2 and selecting a trait for one follower each week. Alternatively, you can speak to Akjana or Lysa at your garrison building or Lunarfall Inn to earn an extra follower each week.",
+    "source_chunk_ids": [
+      "88827b3321c2d1345ab19324542ce171",
+      "3108944522735803a7abb744102f5428",
+      "63c20f74ae39fc9862059185c3ef0e2d"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03566622734069824,
+      "generation": 9.989633321762085,
+      "total": 10.025299549102783
+    }
+  },
+  {
+    "query_id": "265552",
+    "query": "how long is zales layaway",
+    "answer": "Zales does not offer layaway, according to the context.",
+    "source_chunk_ids": [
+      "96074ba7ef1b8d6b5a69c6c055583817"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03517889976501465,
+      "generation": 8.601133108139038,
+      "total": 8.636312007904053
+    }
+  },
+  {
+    "query_id": "227261",
+    "query": "how does pollution increase human population",
+    "answer": "Pollution is a result of an increase in human population, not a cause.",
+    "source_chunk_ids": [
+      "fa7bbd1dbd8b9a4da3aac05e3682de4e",
+      "946133d4a31e1fdb3a478208728e3055",
+      "f76cf22aa6cd3eac619cf742f04f85d2"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03547263145446777,
+      "generation": 7.679210662841797,
+      "total": 7.714683294296265
+    }
+  },
+  {
+    "query_id": "227029",
+    "query": "how does nhl playoff seeding work",
+    "answer": "The NHL playoff seeding works by dividing teams into 2 conferences and 3 divisions per conference. The top 3 teams in each division are seeded 1-3, and the next 2 wild card teams are seeded 4. The teams are re-seeded after the first round, with the highest ranking team playing the lowest ranking team.",
+    "source_chunk_ids": [
+      "b90cd65f7d235457c9402e6eb6833099",
+      "2d0649ff62e1915b1196e9f5993cafed"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03176307678222656,
+      "generation": 9.743815898895264,
+      "total": 9.77557897567749
+    }
+  },
+  {
+    "query_id": "166290",
+    "query": "does filth cause ringworm?",
+    "answer": "No, filth is not mentioned as a cause of ringworm in the provided context. However, warm, moist areas and poor hygiene (e.g., using public showers) can contribute to the spread of ringworm.",
+    "source_chunk_ids": [
+      "d3a24a137badfac64105031ad4e8e6e1",
+      "3c0c5275e81f285a4e2bc51620e7fee7"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03958487510681152,
+      "generation": 8.927019834518433,
+      "total": 8.966604709625244
+    }
+  },
+  {
+    "query_id": "316415",
+    "query": "how much does it cost to recement a crown",
+    "answer": "The cost to recement a crown ranges from $500 to $2,500, depending on the materials used and location.",
+    "source_chunk_ids": [
+      "d602f66418a5e611f5a64e82446d0001",
+      "1db3d617bd1a69b6433d6a9d2fc37759"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.03776288032531738,
+      "generation": 7.829029321670532,
+      "total": 7.86679220199585
+    }
+  },
+  {
+    "query_id": "1060370",
+    "query": "what is barrel o slime?",
+    "answer": "Barrel O Slime is a toy consisting of a plastic trash can filled with a viscous, oozing green material made primarily from guar gum.",
+    "source_chunk_ids": [
+      "943e0683369dd0af3658edd4d7ef8904",
+      "d21d78f901d2fbae021161ba01944cfd"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.04036545753479004,
+      "generation": 7.609473705291748,
+      "total": 7.649839162826538
+    }
+  },
+  {
+    "query_id": "233826",
+    "query": "how fast does an eagle travel",
+    "answer": "Eagles fly 30 to 55 mph and dive at over 100 mph.",
+    "source_chunk_ids": [
+      "f0487b825c1c72b42af99b0188955e5c"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.04021120071411133,
+      "generation": 7.682443618774414,
+      "total": 7.722654819488525
+    }
+  },
+  {
+    "query_id": "1090355",
+    "query": "stubhub toll free number",
+    "answer": "1-866-788-2482",
+    "source_chunk_ids": [
+      "1aedb0d7424e543c822f8aa45f84fba6",
+      "030922edf8b6c76ad3527eec864051b4",
+      "b9975d3a2d2610c845dff46707a5b783",
+      "c102f6e528f8d5e88ca6881cb47402a8"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.0337674617767334,
+      "generation": 8.714417457580566,
+      "total": 8.7481849193573
+    }
+  },
+  {
+    "query_id": "287284",
+    "query": "how many kw do solar city panels produce",
+    "answer": "The context does not mention 'Solar City' panels, but it does mention a 1.8 kW system size.",
+    "source_chunk_ids": [
+      "39b5950a1f828dd396d3aa4a13ef5698"
+    ],
+    "model": "llama-3.1-8b-instant",
+    "latencies": {
+      "retrieval": 0.040612220764160156,
+      "generation": 9.458386898040771,
+      "total": 9.498999118804932
+    }
+  }
+]

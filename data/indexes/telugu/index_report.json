@@ -1,0 +1,9 @@
+{
+  "language": "te",
+  "chunks_indexed": 5070,
+  "sentences_indexed": 18996,
+  "embedding_model": "intfloat/multilingual-e5-small",
+  "dimension": 384,
+  "device": "cpu",
+  "build_time_seconds": 281.1394057273865
+}
