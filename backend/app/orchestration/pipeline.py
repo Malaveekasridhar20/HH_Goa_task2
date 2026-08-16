@@ -25,14 +25,9 @@ class VoiceRAGPipeline:
                  
         self.stt_service = stt_service or STTService()
         
-        # We initialize EmbeddingService once to share across all retrievers and save massive RAM
-        try:
-            from app.retrieval.embeddings import EmbeddingService
-            self.embedding_service = EmbeddingService()
-        except Exception as e:
-            logger.warning(f"Failed to load embedding service: {e}")
-            self.embedding_service = None
-            
+        # PyTorch and Embeddings will be lazy-loaded to bypass Render's strict 512MB startup limits
+        self._embedding_service_instance = None
+        
         # Store provided retrievers (e.g. from tests)
         self._retrievers = {}
         if en_retriever: self._retrievers["en"] = en_retriever
@@ -41,7 +36,8 @@ class VoiceRAGPipeline:
         if te_retriever: self._retrievers["te"] = te_retriever
         if ml_retriever: self._retrievers["ml"] = ml_retriever
         
-        self.extractive_generator = extractive_generator or ExtractiveAnswerGenerator(embedding_service=self.embedding_service)
+        # Store provided generator or lazy load
+        self._provided_extractive_generator = extractive_generator
             
         self.llm_generator = llm_generator or AnswerGenerator()
         
@@ -55,6 +51,22 @@ class VoiceRAGPipeline:
     def te_retriever(self): return self._retrievers.get("te")
     @property
     def ml_retriever(self): return self._retrievers.get("ml")
+
+    @property
+    def embedding_service(self):
+        if self._embedding_service_instance is None:
+            from app.retrieval.embeddings import EmbeddingService
+            self._embedding_service_instance = EmbeddingService()
+        return self._embedding_service_instance
+        
+    @property
+    def extractive_generator(self):
+        if self._provided_extractive_generator is not None:
+            return self._provided_extractive_generator
+        if not hasattr(self, '_lazy_extractive_generator'):
+            from app.generation.extractive_generator import ExtractiveAnswerGenerator
+            self._lazy_extractive_generator = ExtractiveAnswerGenerator(embedding_service=self.embedding_service)
+        return self._lazy_extractive_generator
 
     def execute(self, request: VoiceRAGRequest) -> VoiceRAGResponse:
         t_total_start = time.perf_counter()
