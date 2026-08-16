@@ -7,7 +7,7 @@ from app.retrieval.bm25_index import BM25Index
 from app.retrieval.persistence import MetadataStore
 
 class Retriever:
-    def __init__(self, index_dir: str):
+    def __init__(self, index_dir: str, embedding_service=None):
         self.index_dir = index_dir
         
         # Load indexes and metadata
@@ -15,8 +15,8 @@ class Retriever:
         self.faiss_index = FaissIndex.load(os.path.join(index_dir, "faiss.index"))
         self.bm25_index = BM25Index.load(os.path.join(index_dir, "bm25.pkl"))
         
-        # Embedding service
-        self.embedding_service = EmbeddingService()
+        # Embedding service (shared to save RAM)
+        self.embedding_service = embedding_service or EmbeddingService()
 
     def retrieve_vector(self, query: str, top_k: int = 10) -> List[RetrievalResult]:
         """

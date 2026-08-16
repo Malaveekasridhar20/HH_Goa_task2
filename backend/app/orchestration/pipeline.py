@@ -25,22 +25,23 @@ class VoiceRAGPipeline:
                  
         self.stt_service = stt_service or STTService()
         
-        # Load default retrievers if not provided (they will load index from standard paths if available)
+        # We initialize EmbeddingService once to share across all retrievers and save massive RAM
         try:
-            self.en_retriever = en_retriever or Retriever(index_dir="data/indexes/english")
-            self.hi_retriever = hi_retriever or Retriever(index_dir="data/indexes/hindi")
-            self.ta_retriever = ta_retriever or Retriever(index_dir="data/indexes/tamil")
-            self.te_retriever = te_retriever or Retriever(index_dir="data/indexes/telugu")
-            self.ml_retriever = ml_retriever or Retriever(index_dir="data/indexes/malayalam")
-            self.extractive_generator = extractive_generator or ExtractiveAnswerGenerator(embedding_service=self.en_retriever.embedding_service)
+            from app.retrieval.embeddings import EmbeddingService
+            self.embedding_service = EmbeddingService()
         except Exception as e:
-            logger.warning(f"Failed to load default indices: {e}")
-            self.en_retriever = en_retriever
-            self.hi_retriever = hi_retriever
-            self.ta_retriever = ta_retriever
-            self.te_retriever = te_retriever
-            self.ml_retriever = ml_retriever
-            self.extractive_generator = extractive_generator
+            logger.warning(f"Failed to load embedding service: {e}")
+            self.embedding_service = None
+            
+        # Store provided retrievers (e.g. from tests)
+        self._retrievers = {}
+        if en_retriever: self._retrievers["en"] = en_retriever
+        if hi_retriever: self._retrievers["hi"] = hi_retriever
+        if ta_retriever: self._retrievers["ta"] = ta_retriever
+        if te_retriever: self._retrievers["te"] = te_retriever
+        if ml_retriever: self._retrievers["ml"] = ml_retriever
+        
+        self.extractive_generator = extractive_generator or ExtractiveAnswerGenerator(embedding_service=self.embedding_service)
             
         self.llm_generator = llm_generator or AnswerGenerator()
         
@@ -137,16 +138,22 @@ class VoiceRAGPipeline:
         # Choose language index based on hint or detected. Default to English for simplicity if unknown.
         lang = request.language_hint or stt_resp.detected_language or "en"
         lang = lang.lower()
+        # Lazy load retriever to avoid memory spikes
+        def get_retriever(lang_key, index_path):
+            if lang_key not in self._retrievers:
+                self._retrievers[lang_key] = Retriever(index_dir=index_path, embedding_service=self.embedding_service)
+            return self._retrievers[lang_key]
+
         if "hi" in lang:
-            retriever = self.hi_retriever
+            retriever = get_retriever("hi", "data/indexes/hindi")
         elif "ta" in lang:
-            retriever = self.ta_retriever
+            retriever = get_retriever("ta", "data/indexes/tamil")
         elif "te" in lang:
-            retriever = self.te_retriever
+            retriever = get_retriever("te", "data/indexes/telugu")
         elif "ml" in lang:
-            retriever = self.ml_retriever
+            retriever = get_retriever("ml", "data/indexes/malayalam")
         else:
-            retriever = self.en_retriever
+            retriever = get_retriever("en", "data/indexes/english")
             
         if not retriever:
             return VoiceRAGResponse(
