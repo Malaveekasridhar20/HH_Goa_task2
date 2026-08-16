@@ -1,6 +1,6 @@
 # HH Goa 2026 Task 2: High-Performance Voice RAG 🚀
 
-![Hacker House Goa Voice RAG Demo](frontend/assets/screenshot.png)
+![Hacker House Goa Voice RAG Demo](frontend/assets/screenshot_v2.png)
 
 A hyper-optimized, **Voice-Enabled Retrieval-Augmented Generation (RAG)** pipeline built specifically for Hacker House Goa 2026. This system ingests voice questions, transcribes them, executes advanced semantic hybrid retrieval across the official `ai4bharat/MSMARCO-XI` dataset, and extracts mathematically grounded answers with extreme speed and precision.
 
