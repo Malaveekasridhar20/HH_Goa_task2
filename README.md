@@ -717,7 +717,17 @@ The current extractive generator provides:
 
 ---
 
-# 🖥️ Live Demo
+# 🖥️ Live Demo & Evidence
+
+### Live RAG Pipeline
+
+The application provides an end-to-end voice-enabled RAG pipeline with:
+
+Voice → Sarvam STT → Language Routing → Adaptive Chunking
+→ FAISS + BM25 → 70/30 Fusion → Extractive Generation
+→ Grounding Check → Answer / Safe Refusal
+
+![Live RAG Demo](docs/images/live-rag-demo.png)
 
 ### Live Application
 
