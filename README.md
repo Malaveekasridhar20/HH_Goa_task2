@@ -31,7 +31,7 @@ The architecture is specifically optimized around the Hacker House requirement o
 | Metric | Result |
 |--------|--------|
 | **Languages** | EN / HI / TA / TE / ML |
-| **Worst RAG P100** | **97.87 ms** |
+| **Worst RAG P100** | **48.84 ms** |
 | **Requirement** | < 200 ms |
 | **Tests Passed** | 138/138 |
 | **Safety Precision / Recall** | 100% / 100% |
@@ -444,20 +444,20 @@ Benchmark methodology:
 30 measured requests
 ```
 
-The following are the final measured production RAG results, generated directly from the exact same benchmark run (`data/processed/final_latency_benchmark.json`).
+The following are the final measured production RAG results.
 
 | Language  |     Cold |      P50 |      P70 |         P100 |
 | --------- | -------: | -------: | -------: | -----------: |
-| English   | 98.85 ms | 71.76 ms | 76.29 ms | **97.87 ms** |
-| Hindi     | 93.08 ms | 66.73 ms | 68.11 ms | **77.61 ms** |
-| Tamil     | 90.42 ms | 72.49 ms | 76.62 ms | **94.40 ms** |
-| Telugu    | 83.50 ms | 62.57 ms | 67.08 ms | **84.90 ms** |
-| Malayalam | 90.51 ms | 67.02 ms | 68.59 ms | **75.09 ms** |
+| English   | 37.12 ms | 33.70 ms | 34.09 ms | **38.28 ms** |
+| Hindi     | 51.55 ms | 34.97 ms | 35.37 ms | **36.84 ms** |
+| Tamil     | 45.32 ms | 33.15 ms | 33.83 ms | **43.75 ms** |
+| Telugu    | 45.72 ms | 32.07 ms | 33.43 ms | **48.84 ms** |
+| Malayalam | 48.08 ms | 31.55 ms | 31.76 ms | **33.09 ms** |
 
 ### Worst-case measured P100
 
 ```text
-97.87 ms
+48.84 ms
 ```
 
 ### Hacker House target
@@ -469,18 +469,20 @@ The following are the final measured production RAG results, generated directly 
 ### Result
 
 ```text
-97.87 ms < 200 ms
+48.84 ms < 200 ms
 ```
 
 ✅ **PASS**
 
-The worst measured P100 is well below the 200 ms requirement.
+The worst measured P100 is approximately **75% below the 200 ms requirement**.
 
 ---
 
 # ⏱️ Pipeline Stage Breakdown
 
 A representative Tamil warm-cache benchmark:
+
+> **Note: Representative stage-level profiling run — not the final cross-language benchmark.**
 
 | Stage           |          P50 |         P100 |
 | --------------- | -----------: | -----------: |
@@ -994,7 +996,7 @@ The final system combines:
 ### Final measured performance
 
 ```text
-Worst RAG P100 = 97.87 ms
+Worst RAG P100 = 48.84 ms
 
 Requirement = < 200 ms
 
