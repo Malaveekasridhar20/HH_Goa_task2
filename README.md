@@ -478,11 +478,9 @@ The worst measured P100 is approximately **75% below the 200 ms requirement**.
 
 ---
 
-# ⏱️ Pipeline Stage Breakdown
+# ⏱️ Historical/Representative Tamil Stage Breakdown
 
-A representative Tamil warm-cache benchmark:
-
-> **Note: Representative stage-level profiling run — not the final cross-language benchmark.**
+This is a representative earlier warm-cache stage measurement. The final production benchmark above was rerun on the locked build and is the authoritative submission benchmark.
 
 | Stage           |          P50 |         P100 |
 | --------------- | -----------: | -----------: |
