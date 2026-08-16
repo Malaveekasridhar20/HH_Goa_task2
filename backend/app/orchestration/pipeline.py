@@ -45,6 +45,17 @@ class VoiceRAGPipeline:
             
         self.llm_generator = llm_generator or AnswerGenerator()
         
+    @property
+    def en_retriever(self): return self._retrievers.get("en")
+    @property
+    def hi_retriever(self): return self._retrievers.get("hi")
+    @property
+    def ta_retriever(self): return self._retrievers.get("ta")
+    @property
+    def te_retriever(self): return self._retrievers.get("te")
+    @property
+    def ml_retriever(self): return self._retrievers.get("ml")
+
     def execute(self, request: VoiceRAGRequest) -> VoiceRAGResponse:
         t_total_start = time.perf_counter()
         
