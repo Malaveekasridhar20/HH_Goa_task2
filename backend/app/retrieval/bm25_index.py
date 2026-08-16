@@ -15,11 +15,13 @@ class BM25Index:
         Tokenizes text for BM25.
         Converts to lowercase and splits by non-alphanumeric characters,
         but crucially preserves Unicode alphanumeric characters for Hindi/Indic support.
+        Strips standard punctuation AND Indic punctuation (Danda).
         """
         text = text.lower()
         import string
+        punctuation_to_strip = string.punctuation + '।॥'
         tokens = text.split()
-        return [t.strip(string.punctuation) for t in tokens if t.strip(string.punctuation)]
+        return [t.strip(punctuation_to_strip) for t in tokens if t.strip(punctuation_to_strip)]
 
     def build_index(self, documents: List[str]):
         """

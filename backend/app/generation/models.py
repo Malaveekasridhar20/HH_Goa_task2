@@ -10,3 +10,4 @@ class GenerationResponse(BaseModel):
     source_chunk_ids: List[str] = Field(default_factory=list, description="List of chunk IDs that the answer was grounded on.")
     model: str = Field(..., description="The name of the generation model used.")
     generation_latency: float = Field(0.0, description="Latency in seconds for generation.")
+    refusal_reason: str = Field(default="", description="Structured reason if the generation was safely refused.")

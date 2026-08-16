@@ -73,6 +73,17 @@ class ExtractiveAnswerGenerator:
         # Per-instance cache — naturally partitioned by language since each
         # language pipeline instantiates its own generator.
         self._cache = _SentenceEmbeddingCache()
+        self.precomputed_embeddings = {}
+
+    def load_precomputed_embeddings(self, pkl_path: str):
+        import pickle
+        if os.path.exists(pkl_path):
+            with open(pkl_path, "rb") as f:
+                data = pickle.load(f)
+                self.precomputed_embeddings.update(data)
+                logger.info(f"Loaded {len(data)} precomputed sentence embeddings from {pkl_path}")
+        else:
+            logger.warning(f"Precomputed embeddings not found at {pkl_path}")
 
     def _split_sentences(self, text: str) -> List[str]:
         """Splits text into sentences based on ., ?, !, and Indic danda ।"""
@@ -92,14 +103,17 @@ class ExtractiveAnswerGenerator:
         retrieved_chunks: List[RetrievalResult],
         language: str = None,
     ) -> GenerationResponse:
-        t0 = time.time()
+        t0 = time.perf_counter()
 
         if not retrieved_chunks:
+            t_end = time.perf_counter()
+            self.last_timings = {"generation": (t_end - t0) * 1000, "grounding": 0.0}
             return GenerationResponse(
                 answer="I don't have enough information in the retrieved context to answer that.",
                 source_chunk_ids=[],
                 model="extractive",
-                generation_latency=time.time() - t0,
+                generation_latency=t_end - t0,
+                refusal_reason="Insufficient context: no retrieved chunks provided."
             )
 
         # ── Step 1: Collect all candidate sentences and their cache keys ──
@@ -117,11 +131,14 @@ class ExtractiveAnswerGenerator:
                     cache_keys.append((chunk.chunk_id, idx, s))
 
         if not candidate_sentences:
+            t_end = time.perf_counter()
+            self.last_timings = {"generation": (t_end - t0) * 1000, "grounding": 0.0}
             return GenerationResponse(
                 answer="I don't have enough information in the retrieved context to answer that.",
                 source_chunk_ids=[],
                 model="extractive",
-                generation_latency=time.time() - t0,
+                generation_latency=t_end - t0,
+                refusal_reason="Insufficient context: chunks provided but no valid sentences extracted."
             )
 
         # ── Step 2: Cache lookup — collect which sentences are missing ──
@@ -130,16 +147,23 @@ class ExtractiveAnswerGenerator:
         missing_positions = []   # indices into candidate_sentences
 
         for i, key in enumerate(cache_keys):
-            cached = self._cache.get(key)
-            if cached is not None:
-                result_embs[i] = cached
+            # Check static precomputed embeddings first
+            static_cached = self.precomputed_embeddings.get(key)
+            if static_cached is not None:
+                result_embs[i] = static_cached
             else:
-                missing_positions.append(i)
+                # Fallback to dynamic LRU cache
+                cached = self._cache.get(key)
+                if cached is not None:
+                    result_embs[i] = cached
+                else:
+                    missing_positions.append(i)
 
         # ── Step 3: Batch-encode ALL missing sentences in ONE call ──
         # This preserves the original single-batch encode_documents() pattern,
         # so cold-path performance is identical to the un-cached version.
         if missing_positions:
+            logger.warning(f"Extractive cache miss for {len(missing_positions)} sentences. Falling back to dynamic encoding.")
             missing_texts = [candidate_sentences[i] for i in missing_positions]
             new_embs = self.embedding_service.encode_documents(missing_texts)
             for list_pos, orig_idx in enumerate(missing_positions):
@@ -151,29 +175,40 @@ class ExtractiveAnswerGenerator:
         sentence_embs = np.array(result_embs)
 
         # ── Step 5: Query embedding + cosine similarity (unchanged) ──
+        t_ground_start = time.perf_counter()
         query_emb = self.embedding_service.encode_query(query)
         scores = np.dot(sentence_embs, query_emb)
 
         # ── Step 6: Best-sentence selection + refusal threshold (unchanged) ──
         best_idx = int(np.argmax(scores))
         best_score = float(scores[best_idx])
+        t_ground_end = time.perf_counter()
 
         if best_score < self.relevance_threshold:
+            self.last_timings = {
+                "generation": (t_ground_start - t0) * 1000,
+                "grounding": (t_ground_end - t_ground_start) * 1000
+            }
             return GenerationResponse(
                 answer="I don't have enough information in the retrieved context to answer that.",
                 source_chunk_ids=[],
                 model="extractive",
-                generation_latency=time.time() - t0,
+                generation_latency=time.perf_counter() - t0,
+                refusal_reason=f"Grounding failure: max relevance {best_score:.3f} < threshold {self.relevance_threshold}"
             )
 
         best_sentence = candidate_sentences[best_idx]
         best_chunk_id = sentence_to_chunk_id[best_idx]
 
+        self.last_timings = {
+            "generation": (t_ground_start - t0) * 1000,
+            "grounding": (t_ground_end - t_ground_start) * 1000
+        }
         return GenerationResponse(
             answer=best_sentence,
             source_chunk_ids=[best_chunk_id],
             model="extractive",
-            generation_latency=time.time() - t0,
+            generation_latency=time.perf_counter() - t0,
         )
 
     def cache_stats(self) -> dict:

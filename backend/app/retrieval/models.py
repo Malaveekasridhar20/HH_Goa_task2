@@ -36,20 +36,16 @@ class RetrievalResult(BaseModel):
     source_lang: str
     is_selected: bool
 
-class HybridRetrievalResult(BaseModel):
+class HybridRetrievalResult(RetrievalResult):
     """
     Structured result returned by the hybrid retriever.
+    Inherits from RetrievalResult so `score` retains the original dense cosine similarity.
     """
-    chunk_id: str
-    text: str
     hybrid_score: float
     vector_score: float
     bm25_score: float
     normalized_vector_score: float
     normalized_bm25_score: float
-    rank: int
-    source_lang: str
-    is_selected: bool
 
 class RerankedResult(BaseModel):
     """

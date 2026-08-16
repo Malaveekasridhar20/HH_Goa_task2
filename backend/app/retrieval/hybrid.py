@@ -100,6 +100,7 @@ class HybridRetriever:
             final_results.append(HybridRetrievalResult(
                 chunk_id=chunk.chunk_id,
                 text=chunk.text,
+                score=data["vector_score"],
                 hybrid_score=data["hybrid_score"],
                 vector_score=data["vector_score"],
                 bm25_score=data["bm25_score"],

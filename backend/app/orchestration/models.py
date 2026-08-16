@@ -17,5 +17,16 @@ class VoiceRAGResponse(BaseModel):
     stt_latency_ms: float = 0.0
     retrieval_latency_ms: float = 0.0
     generation_latency_ms: float = 0.0
+    total_rag_latency_ms: float = 0.0
     total_latency_ms: float = 0.0
+    
+    # Detailed pipeline latencies
+    guardrails_latency_ms: float = 0.0
+    embedding_latency_ms: float = 0.0
+    faiss_latency_ms: float = 0.0
+    bm25_latency_ms: float = 0.0
+    fusion_latency_ms: float = 0.0
+    grounding_latency_ms: float = 0.0
+    
     error: Optional[str] = None
+    refusal_reason: Optional[str] = None

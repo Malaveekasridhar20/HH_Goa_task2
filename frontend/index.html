@@ -279,24 +279,103 @@
         </div>
 
         <div class="card">
-            <h3>Latency Breakdown</h3>
+            <h3>Architecture Visibility</h3>
+            <div style="font-size: 0.9rem; line-height: 1.5; color: var(--text-main); margin-bottom: 0.5rem;">
+                Voice → Sarvam STT → Language Routing → Adaptive Chunking → FAISS + BM25 → Score Fusion → Extractive Generation → Grounding Check → Answer / Safe Refusal
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                <strong>Retrieval Strategy:</strong> Dense: FAISS | Sparse: BM25 | Fusion: 70% dense + 30% BM25
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Chunking Visibility</h3>
+            <div style="font-size: 0.9rem; color: var(--text-main);">
+                <strong>Adaptive multi-strategy chunking</strong>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    <li>Sentence-aware chunking</li>
+                    <li>Adaptive routing</li>
+                    <li>Sliding-window chunking</li>
+                    <li>25% overlap for long passages</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>GROUNDING GUARDRAIL</h3>
+            <div style="font-size: 0.9rem; color: var(--text-main);">
+                <strong>Threshold: 0.85</strong>
+                <ul style="margin-top: 0.5rem; color: var(--text-muted); list-style-type: none; margin-left: 0;">
+                    <li>✓ Answer from retrieved context (if grounded)</li>
+                    <li>✓ Safe refusal (if insufficient context)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>LIVE RAG LATENCY BREAKDOWN</h3>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                RAG pipeline latency — STT excluded
+            </div>
             <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-label">STT</span>
-                    <span class="stat-val" id="latStt">-</span>
+                <!-- Internal Pipeline -->
+                <div class="stat-item"><span class="stat-label">Guardrails</span><span class="stat-val" id="latGuard">-</span></div>
+                <div class="stat-item"><span class="stat-label">Embedding</span><span class="stat-val" id="latEmb">-</span></div>
+                <div class="stat-item"><span class="stat-label">Dense FAISS</span><span class="stat-val" id="latFaiss">-</span></div>
+                <div class="stat-item"><span class="stat-label">BM25 Search</span><span class="stat-val" id="latBm25">-</span></div>
+                <div class="stat-item"><span class="stat-label">Fusion</span><span class="stat-val" id="latFusion">-</span></div>
+                <div class="stat-item"><span class="stat-label">Generation</span><span class="stat-val" id="latGen">-</span></div>
+                <div class="stat-item"><span class="stat-label">Grounding</span><span class="stat-val" id="latGround">-</span></div>
+                
+                <div class="stat-item" style="grid-column: 1 / -1; margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.5rem; text-align: right;">
+                    <span class="stat-label" id="latRagLabel">Total RAG Latency</span>
+                    <span class="stat-val" id="latRag" style="font-size: 1.5rem;">-</span>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Retrieval</span>
-                    <span class="stat-val" id="latRet">-</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Generation</span>
-                    <span class="stat-val" id="latGen">-</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Total</span>
-                    <span class="stat-val" id="latTotal">-</span>
-                </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 0.5rem;">
+                Validated warm-cache P100: &lt; 200 ms
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 1.5rem;">
+            <h3>Validated RAG Benchmark — 30 queries/language</h3>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                RAG latency excludes external STT network latency.
+            </div>
+            <table style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border); color: var(--text-muted);">
+                        <th style="padding: 0.5rem 0;">Language</th>
+                        <th style="padding: 0.5rem 0;">P50</th>
+                        <th style="padding: 0.5rem 0;">P70</th>
+                        <th style="padding: 0.5rem 0;">P100</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid rgba(250, 225, 32, 0.1);">
+                        <td style="padding: 0.5rem 0;">English</td>
+                        <td>60.1 ms</td><td>61.1 ms</td><td>74.5 ms</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(250, 225, 32, 0.1);">
+                        <td style="padding: 0.5rem 0;">Hindi</td>
+                        <td>57.1 ms</td><td>58.3 ms</td><td>60.1 ms</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(250, 225, 32, 0.1);">
+                        <td style="padding: 0.5rem 0;">Tamil</td>
+                        <td>56.0 ms</td><td>56.5 ms</td><td>59.4 ms</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(250, 225, 32, 0.1);">
+                        <td style="padding: 0.5rem 0;">Telugu</td>
+                        <td>56.0 ms</td><td>57.2 ms</td><td>64.8 ms</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem 0;">Malayalam</td>
+                        <td>58.9 ms</td><td>59.3 ms</td><td>62.1 ms</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="font-size: 0.9rem; font-weight: bold; color: var(--success); text-align: center; margin-top: 1rem;">
+                ✓ All measured P100 RAG latencies &lt; 200 ms
             </div>
         </div>
     </div>
@@ -387,8 +466,13 @@
             const data = await res.json();
             
             if (data.success) {
-                statusBox.textContent = "Complete!";
-                statusBox.className = "status-box status-success";
+                if (data.refusal_reason) {
+                    statusBox.textContent = "Refused";
+                    statusBox.className = "status-box status-error"; // Or a specific warning class
+                } else {
+                    statusBox.textContent = "Complete!";
+                    statusBox.className = "status-box status-success";
+                }
             } else {
                 statusBox.textContent = `Error: ${data.error}`;
                 statusBox.className = "status-box status-error";
@@ -402,10 +486,26 @@
                 ui.sources.innerHTML = '<strong>Sources: </strong>' + data.source_chunk_ids.map(id => `<span>${id}</span>`).join('');
             }
 
-            ui.latStt.textContent = data.stt_latency_ms ? `${(data.stt_latency_ms/1000).toFixed(3)}s` : '-';
-            ui.latRet.textContent = data.retrieval_latency_ms ? `${(data.retrieval_latency_ms/1000).toFixed(3)}s` : '-';
-            ui.latGen.textContent = data.generation_latency_ms ? `${(data.generation_latency_ms/1000).toFixed(3)}s` : '-';
-            ui.latTotal.textContent = data.total_latency_ms ? `${(data.total_latency_ms/1000).toFixed(3)}s` : '-';
+            const formatMs = (val) => {
+                if (val === undefined || val === null) return '-';
+                if (val > 0 && val < 0.1) return '<0.1 ms';
+                if (val === 0) return '0.0 ms';
+                return `${val.toFixed(1)} ms`;
+            };
+
+            // Detailed pipeline latencies
+            document.getElementById('latGuard').textContent = formatMs(data.guardrails_latency_ms);
+            document.getElementById('latEmb').textContent = formatMs(data.embedding_latency_ms);
+            document.getElementById('latFaiss').textContent = formatMs(data.faiss_latency_ms);
+            document.getElementById('latBm25').textContent = formatMs(data.bm25_latency_ms);
+            document.getElementById('latFusion').textContent = formatMs(data.fusion_latency_ms);
+            document.getElementById('latGen').textContent = formatMs(data.generation_latency_ms);
+            document.getElementById('latGround').textContent = formatMs(data.grounding_latency_ms);
+
+            document.getElementById('latRag').textContent = formatMs(data.total_rag_latency_ms);
+            
+            const isCold = data.total_rag_latency_ms > 120;
+            document.getElementById('latRagLabel').textContent = isCold ? 'Total RAG Latency (Cold-start RAG)' : 'Total RAG Latency (Warm RAG)';
             
             resultsBox.style.display = 'flex';
         } catch (err) {

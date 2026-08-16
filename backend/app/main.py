@@ -17,7 +17,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 pipeline = VoiceRAGPipeline()
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Initializing and pre-warming the RAG pipeline models...")
+    
+    # 1. Warm up the SentenceTransformer PyTorch forward pass using a simple query
+    try:
+        pipeline.en_retriever.embedding_service.encode_query("warmup")
+        logger.info("PyTorch forward pass warmed up.")
+    except Exception as e:
+        logger.warning(f"Failed to warm up PyTorch forward pass: {e}")
+
+    # 2. Load precomputed sentence embeddings from disk into the generator
+    languages = {"en": "english", "hi": "hindi", "ta": "tamil", "te": "telugu", "ml": "malayalam"}
+    # backend/app/main.py -> backend/app -> backend -> root
+    base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "indexes")
+    
+    for lang, folder in languages.items():
+        pkl_path = os.path.join(base_dir, folder, "sentence_embeddings.pkl")
+        pipeline.extractive_generator.load_precomputed_embeddings(pkl_path)
+            
+    logger.info("RAG pipeline pre-warming complete. Server is ready.")
 
 @app.post("/api/voice/query")
 async def voice_query(audio: UploadFile = File(...), language: str = Form("en")):
