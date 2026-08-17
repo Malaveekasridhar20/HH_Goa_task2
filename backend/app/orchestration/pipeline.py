@@ -165,6 +165,13 @@ class VoiceRAGPipeline:
         def get_retriever(lang_key, index_path):
             if lang_key not in self._retrievers:
                 self._retrievers[lang_key] = Retriever(index_dir=index_path, embedding_service=self.embedding_service)
+                
+                # Lazy-load sentence embeddings for extractive generator
+                if request.generation_mode != "llm":
+                    import os
+                    pkl_path = os.path.join(index_path, "sentence_embeddings.pkl")
+                    self.extractive_generator.load_precomputed_embeddings(pkl_path)
+                    
             return self._retrievers[lang_key]
 
         if "hi" in lang:
