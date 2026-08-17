@@ -382,6 +382,11 @@
 </div>
 
 <script>
+    // Configuration: Set this to the absolute URL of the Cloud Run backend if deploying the frontend separately.
+    // Example: const API_BASE_URL = "https://backend-service-abc123.a.run.app";
+    // For relative same-origin deployment, leave as empty string "".
+    const API_BASE_URL = "";
+
     let mediaRecorder;
     let audioChunks = [];
 
@@ -456,7 +461,7 @@
         formData.append('language', langSelect.value);
 
         try {
-            const res = await fetch('/api/voice/query', {
+            const res = await fetch(`${API_BASE_URL}/api/voice/query`, {
                 method: 'POST',
                 body: formData
             });

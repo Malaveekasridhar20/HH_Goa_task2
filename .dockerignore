@@ -1,0 +1,8 @@
+﻿venv/
+data/raw/
+data/processed/
+.git/
+.env
+__pycache__/
+*.pyc
+scratch/

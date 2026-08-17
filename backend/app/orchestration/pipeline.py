@@ -13,7 +13,7 @@ from app.orchestration.safety_filter import check_safety
 logger = logging.getLogger(__name__)
 
 class VoiceRAGPipeline:
-    def __init__(self, 
+    def __init__(self,
                  stt_service: Optional[STTService] = None,
                  en_retriever: Optional[Retriever] = None,
                  hi_retriever: Optional[Retriever] = None,
@@ -22,12 +22,12 @@ class VoiceRAGPipeline:
                  ml_retriever: Optional[Retriever] = None,
                  extractive_generator: Optional[ExtractiveAnswerGenerator] = None,
                  llm_generator: Optional[AnswerGenerator] = None):
-                 
+
         self.stt_service = stt_service or STTService()
-        
+
         # PyTorch and Embeddings will be lazy-loaded to bypass Render's strict 512MB startup limits
         self._embedding_service_instance = None
-        
+
         # Store provided retrievers (e.g. from tests)
         self._retrievers = {}
         if en_retriever: self._retrievers["en"] = en_retriever
@@ -35,12 +35,12 @@ class VoiceRAGPipeline:
         if ta_retriever: self._retrievers["ta"] = ta_retriever
         if te_retriever: self._retrievers["te"] = te_retriever
         if ml_retriever: self._retrievers["ml"] = ml_retriever
-        
+
         # Store provided generator or lazy load
         self._provided_extractive_generator = extractive_generator
-            
-        self.llm_generator = llm_generator or AnswerGenerator()
-        
+        self._provided_llm_generator = llm_generator
+
+
     @property
     def en_retriever(self): return self._retrievers.get("en")
     @property
@@ -58,19 +58,22 @@ class VoiceRAGPipeline:
             from app.retrieval.embeddings import EmbeddingService
             self._embedding_service_instance = EmbeddingService()
         return self._embedding_service_instance
-        
+
     @property
     def extractive_generator(self):
-        if self._provided_extractive_generator is not None:
-            return self._provided_extractive_generator
-        if not hasattr(self, '_lazy_extractive_generator'):
-            from app.generation.extractive_generator import ExtractiveAnswerGenerator
-            self._lazy_extractive_generator = ExtractiveAnswerGenerator(embedding_service=self.embedding_service)
-        return self._lazy_extractive_generator
+        if not self._provided_extractive_generator:
+            self._provided_extractive_generator = ExtractiveAnswerGenerator(embedding_service=self.embedding_service)
+        return self._provided_extractive_generator
+
+    @property
+    def llm_generator(self):
+        if not self._provided_llm_generator:
+            self._provided_llm_generator = AnswerGenerator()
+        return self._provided_llm_generator
 
     def execute(self, request: VoiceRAGRequest) -> VoiceRAGResponse:
         t_total_start = time.perf_counter()
-        
+
         # 1. Validate Audio
         if not request.audio_data or len(request.audio_data) == 0:
             return VoiceRAGResponse(
@@ -87,11 +90,11 @@ class VoiceRAGPipeline:
             audio_data=request.audio_data,
             language_hint=request.language_hint
         )
-        
+
         t_stt_start = time.perf_counter()
         stt_resp = self.stt_service.transcribe(stt_req)
         stt_latency_ms = (time.perf_counter() - t_stt_start) * 1000
-        
+
         if not stt_resp.success:
             return VoiceRAGResponse(
                 success=False,
@@ -102,7 +105,7 @@ class VoiceRAGPipeline:
                 total_latency_ms=(time.perf_counter() - t_total_start) * 1000,
                 error=f"STT failed: {stt_resp.error}"
             )
-            
+
         # 3. Validate Transcript (Guardrail: empty/off-topic)
         t_guard_start = time.perf_counter()
         t_rag_start = t_guard_start
@@ -121,7 +124,7 @@ class VoiceRAGPipeline:
                 error="Empty or extremely short transcript",
                 refusal_reason="Input rejected: transcript too short."
             )
-        
+
         # Guardrail: excessively long inputs likely an attack or gibberish
         if len(transcript) > 500:
             return VoiceRAGResponse(
@@ -164,14 +167,21 @@ class VoiceRAGPipeline:
         # Lazy load retriever to avoid memory spikes
         def get_retriever(lang_key, index_path):
             if lang_key not in self._retrievers:
+                # Release previously loaded language caches to fit within 512MB RAM
+                self._retrievers.clear()
+
+                if request.generation_mode != "llm":
+                    # Clear the generator's sentence embedding cache
+                    self.extractive_generator.precomputed_embeddings.clear()
+
                 self._retrievers[lang_key] = Retriever(index_dir=index_path, embedding_service=self.embedding_service)
-                
+
                 # Lazy-load sentence embeddings for extractive generator
                 if request.generation_mode != "llm":
                     import os
                     pkl_path = os.path.join(index_path, "sentence_embeddings.pkl")
                     self.extractive_generator.load_precomputed_embeddings(pkl_path)
-                    
+
             return self._retrievers[lang_key]
 
         if "hi" in lang:
@@ -184,7 +194,7 @@ class VoiceRAGPipeline:
             retriever = get_retriever("ml", "data/indexes/malayalam")
         else:
             retriever = get_retriever("en", "data/indexes/english")
-            
+
         if not retriever:
             return VoiceRAGResponse(
                 success=False,
@@ -249,7 +259,7 @@ class VoiceRAGPipeline:
                 error=f"Generation failed: {str(e)}"
             )
         generation_latency_ms = (time.perf_counter() - t_gen_start) * 1000
-        
+
         g_timings = getattr(self.extractive_generator, "last_timings", {}) if request.generation_mode != "llm" else {}
 
         # 6. Response
