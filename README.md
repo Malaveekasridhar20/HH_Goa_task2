@@ -1038,3 +1038,8 @@ A multilingual, low-latency, grounded Voice RAG system designed around real eval
 ---
 
 ## #RAGInGoa
+
+## Live demo and evidence
+Live application : https://hh-goa-task2-rcssx65aka-el.a.run.app/
+Github repo : [https://github.com/Malaveekasridhar20/HH_Goa_task2]
+demo video : https://x.com/MalaveekaS13615/status/2090501439496028519?s=20
