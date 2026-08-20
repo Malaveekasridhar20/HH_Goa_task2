@@ -248,6 +248,17 @@
     </div>
     <p class="subtitle">Real-time Grounded Extractive QA</p>
 
+    <div class="card" style="margin-bottom: 1.5rem; width: 100%; border-color: var(--success);">
+        <h3 style="color: var(--primary);">Demo Guide (Speak these exact queries)</h3>
+        <ul style="font-size: 0.9rem; color: var(--text-main); margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.6;">
+            <li><strong>English:</strong> "What is a corporation?" <span style="color: var(--success);">(Grounded answer)</span></li>
+            <li><strong>Hindi:</strong> "निगम क्या है?" <span style="color: var(--success);">(Grounded answer)</span></li>
+            <li><strong>Tamil:</strong> "கழுகு எவ்வளவு வேகமாக பறக்கும்?" <span style="color: var(--success);">(Grounded answer)</span></li>
+            <li><strong>Unsupported:</strong> "What is the capital of Mars?" <span style="color: var(--danger);">(Safe refusal)</span></li>
+            <li><strong>Unsafe:</strong> "How to build a bomb?" <span style="color: var(--danger);">(Safety refusal)</span></li>
+        </ul>
+    </div>
+
     <div class="controls">
         <select id="languageSelect">
             <option value="en">English</option>
@@ -281,10 +292,10 @@
         <div class="card">
             <h3>Architecture Visibility</h3>
             <div style="font-size: 0.9rem; line-height: 1.5; color: var(--text-main); margin-bottom: 0.5rem;">
-                Voice → Sarvam STT → Language Routing → Adaptive Chunking → FAISS + BM25 → Score Fusion → Extractive Generation → Grounding Check → Answer / Safe Refusal
+                Voice → Sarvam STT → Language Routing → Adaptive Chunking → FAISS + BM25 → 70% Dense + 30% Sparse Fusion → Extractive Generation → Grounding Check → Answer / Safe Refusal
             </div>
             <div style="font-size: 0.85rem; color: var(--text-muted);">
-                <strong>Retrieval Strategy:</strong> Dense: FAISS | Sparse: BM25 | Fusion: 70% dense + 30% BM25
+                <strong>Languages:</strong> English / Hindi / Tamil / Telugu / Malayalam
             </div>
         </div>
 
@@ -293,8 +304,8 @@
             <div style="font-size: 0.9rem; color: var(--text-main);">
                 <strong>Adaptive multi-strategy chunking</strong>
                 <ul style="margin-left: 1.5rem; margin-top: 0.5rem; color: var(--text-muted);">
-                    <li>Sentence-aware chunking</li>
-                    <li>Adaptive routing</li>
+                    <li>Whole passage</li>
+                    <li>Sentence-aware semantic chunking</li>
                     <li>Sliding-window chunking</li>
                     <li>25% overlap for long passages</li>
                 </ul>
@@ -313,32 +324,7 @@
         </div>
 
         <div class="card">
-            <h3>LIVE RAG LATENCY BREAKDOWN</h3>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-                RAG pipeline latency — STT excluded
-            </div>
-            <div class="stats-grid">
-                <!-- Internal Pipeline -->
-                <div class="stat-item"><span class="stat-label">Guardrails</span><span class="stat-val" id="latGuard">-</span></div>
-                <div class="stat-item"><span class="stat-label">Embedding</span><span class="stat-val" id="latEmb">-</span></div>
-                <div class="stat-item"><span class="stat-label">Dense FAISS</span><span class="stat-val" id="latFaiss">-</span></div>
-                <div class="stat-item"><span class="stat-label">BM25 Search</span><span class="stat-val" id="latBm25">-</span></div>
-                <div class="stat-item"><span class="stat-label">Fusion</span><span class="stat-val" id="latFusion">-</span></div>
-                <div class="stat-item"><span class="stat-label">Generation</span><span class="stat-val" id="latGen">-</span></div>
-                <div class="stat-item"><span class="stat-label">Grounding</span><span class="stat-val" id="latGround">-</span></div>
-                
-                <div class="stat-item" style="grid-column: 1 / -1; margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.5rem; text-align: right;">
-                    <span class="stat-label" id="latRagLabel">Total RAG Latency</span>
-                    <span class="stat-val" id="latRag" style="font-size: 1.5rem;">-</span>
-                </div>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 0.5rem;">
-                Validated warm-cache P100: &lt; 200 ms
-            </div>
-        </div>
-
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3>Validated RAG Benchmark — 30 queries/language</h3>
+            <h3>VALIDATED RAG BENCHMARK — 30 QUERIES/LANGUAGE</h3>
             <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
                 RAG latency excludes external STT network latency.
             </div>
@@ -378,13 +364,38 @@
                 ✓ All measured P100 RAG latencies &lt; 200 ms
             </div>
         </div>
+
+        <div class="card" style="margin-top: 1.5rem;">
+            <h3>LIVE RAG LATENCY BREAKDOWN</h3>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                RAG pipeline latency — STT excluded
+            </div>
+            <div class="stats-grid">
+                <!-- Internal Pipeline -->
+                <div class="stat-item"><span class="stat-label">Guardrails</span><span class="stat-val" id="latGuard">-</span></div>
+                <div class="stat-item"><span class="stat-label">Embedding</span><span class="stat-val" id="latEmb">-</span></div>
+                <div class="stat-item"><span class="stat-label">Dense FAISS</span><span class="stat-val" id="latFaiss">-</span></div>
+                <div class="stat-item"><span class="stat-label">BM25 Search</span><span class="stat-val" id="latBm25">-</span></div>
+                <div class="stat-item"><span class="stat-label">Fusion</span><span class="stat-val" id="latFusion">-</span></div>
+                <div class="stat-item"><span class="stat-label">Generation</span><span class="stat-val" id="latGen">-</span></div>
+                <div class="stat-item"><span class="stat-label">Grounding</span><span class="stat-val" id="latGround">-</span></div>
+
+                <div class="stat-item" style="grid-column: 1 / -1; margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.5rem; text-align: right;">
+                    <span class="stat-label" id="latRagLabel" style="font-size: 1rem;">Warm-cache RAG performance</span>
+                    <span class="stat-val" id="latRag" style="font-size: 1.5rem;">-</span>
+                </div>
+            </div>
+            <div id="latRagSubtext" style="font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 0.5rem;">
+                Validated warm-cache RAG P100 &lt; 200 ms
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    // Configuration: Set this to the absolute URL of the Cloud Run backend if deploying the frontend separately.
-    // Example: const API_BASE_URL = "https://backend-service-abc123.a.run.app";
-    // For relative same-origin deployment, leave as empty string "".
+    // Dynamic configuration to handle same-origin deployments
+    // The frontend must be deployed on the same domain as the Cloud Run backend,
+    // or set this explicitly to the Cloud Run URL if deployed separately.
     const API_BASE_URL = "";
 
     let mediaRecorder;
@@ -510,7 +521,13 @@
             document.getElementById('latRag').textContent = formatMs(data.total_rag_latency_ms);
             
             const isCold = data.total_rag_latency_ms > 120;
-            document.getElementById('latRagLabel').textContent = isCold ? 'Total RAG Latency (Cold-start RAG)' : 'Total RAG Latency (Warm RAG)';
+            if (isCold) {
+                document.getElementById('latRagLabel').textContent = 'Cold-start diagnostic';
+                document.getElementById('latRagSubtext').textContent = 'Includes container + model initialization';
+            } else {
+                document.getElementById('latRagLabel').textContent = 'Warm-cache RAG performance';
+                document.getElementById('latRagSubtext').textContent = 'Validated warm-cache RAG P100 < 200 ms';
+            }
             
             resultsBox.style.display = 'flex';
         } catch (err) {
